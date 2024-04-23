@@ -42,7 +42,7 @@ class User(Base):
         secondary=user_follow,
         primaryjoin=id == user_follow.c.follower_id,
         secondaryjoin=id == user_follow.c.user_id,
-        backref=backref("following", cascade="all, delete"),
+        backref=backref("follow", cascade="all, delete"),
     )
 
     following: Mapped[list["User"]] = relationship(
@@ -70,6 +70,7 @@ class Post(Base):
     __tablename__ = "post"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    text: Mapped[str] = mapped_column(Text)
     pub_date: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     image: Mapped[str] = mapped_column(String(255), nullable=True)

@@ -12,3 +12,7 @@ sqlalchemy.url = postgresql://romblin@localhost/db
 
 from db import *
 target_metadata = Base.metadata
+
+
+alembic revision --autogenerate -m 'initial'
+alembic upgrade head

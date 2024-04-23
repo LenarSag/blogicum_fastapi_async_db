@@ -3,6 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 
+
 from db import models, schemas
 
 
@@ -19,37 +20,14 @@ class UserRepository:
         result = await session.execute(query)
         return result.scalars().first()
 
+    @classmethod
+    async def create_user(cls, session: AsyncSession, user_data: schemas.UserCreate):
+        db_user = models.User(**user_data.model_dump())
+        session.add(db_user)
+        await session.commit()
+        await session.refresh(db_user)
+        return db_user
 
-#     @classmethod
-#     async def get_user_by_referral_code(cls, session: AsyncSession, referral_code: str):
-#         query = (
-#             select(models.User)
-#             .options(
-#                 joinedload(models.User.referral), joinedload(models.User.referral_code)
-#             )
-#             .join(models.ReferralCode)
-#             .filter_by(code=referral_code)
-#         )
-#         result = await session.execute(query)
-#         return result.scalars().first()
-
-#     @classmethod
-#     async def get_user_referrals(cls, session: AsyncSession, user_id: int):
-#         query = (
-#             select(models.User)
-#             .filter_by(id=user_id)
-#             .options(joinedload(models.User.referral))
-#         )
-#         result = await session.execute(query)
-#         return result.scalars().first()
-
-#     @classmethod
-#     async def create_user(cls, session: AsyncSession, user_data: schemas.UserCreate):
-#         db_user = models.User(**user_data.model_dump())
-#         session.add(db_user)
-#         await session.commit()
-#         await session.refresh(db_user)
-#         return db_user
 
 #     @classmethod
 #     async def create_referral_user(
@@ -62,6 +40,24 @@ class UserRepository:
 #         await session.commit()
 #         await session.refresh(referrer_user)
 #         return referral_user
+
+
+class PostRepository:
+    @classmethod
+    async def create_post(
+        cls, session: AsyncSession, post_data: schemas.PostCreate, user_id: int
+    ):
+        db_post = models.Post(**post_data.model_dump(), author_id=user_id)
+        session.add(db_post)
+        await session.commit()
+        await session.refresh(db_post)
+        return db_post
+
+    @classmethod
+    async def get_posts(cls, session: AsyncSession):
+        query = select(models.Post).order_by(models.Post.pub_date)
+        result = await session.execute(query)
+        return result.scalars().all()
 
 
 # class ReferralCodeRepository:

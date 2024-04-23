@@ -19,7 +19,7 @@ class UserCreate(UserBase):
 
 class UserDB(User, UserBase):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserPosts(UserDB):
@@ -51,7 +51,7 @@ class GroupCreate(BaseModel):
 
 class GroupDB(Group, GroupCreate):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class GroupPosts(GroupDB):
@@ -63,6 +63,7 @@ class Post(BaseModel):
 
 
 class PostCreate(BaseModel):
+    text: str
     image: Optional[str] = None
     group_id: Optional[int] = None
 
@@ -72,7 +73,7 @@ class PostDB(Post, PostCreate):
     author_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PostComments(PostDB):
@@ -93,4 +94,4 @@ class CommentDB(Comment, CommentCreate):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
