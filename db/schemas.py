@@ -64,11 +64,11 @@ class Post(BaseModel):
 
 class PostCreate(BaseModel):
     text: str
-    image: Optional[str] = None
     group_id: Optional[int] = None
 
 
 class PostDB(Post, PostCreate):
+    image: Optional[str] = None
     pub_date: datetime
     author_id: int
 
@@ -77,7 +77,7 @@ class PostDB(Post, PostCreate):
 
 
 class PostComments(PostDB):
-    post_comments: Optional[list["CommentDB"]]
+    post_comments: Optional[list["CommentDB"]] = None
 
 
 class Comment(BaseModel):
