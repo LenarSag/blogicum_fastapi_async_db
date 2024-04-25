@@ -6,11 +6,16 @@ from fastapi import FastAPI
 from db.database import init_models
 from routes.login import loginroute
 from routes.posts import postsrouter
+from routes.groups import groupsrouter
+from routes.follow import followrouter
 
 app = FastAPI()
 
+
 app.include_router(loginroute, prefix="/auth")
 app.include_router(postsrouter, prefix="/posts")
+app.include_router(groupsrouter, prefix="/groups")
+app.include_router(followrouter, prefix="/follow")
 
 
 @app.get("/")

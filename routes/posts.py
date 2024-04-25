@@ -15,23 +15,26 @@ from security.security import get_user_from_token
 from db.database import get_session
 from db.schemas import PostComments, PostCreate, PostDB, UserAuth
 from db.crud import GroupRepository, PostRepository
-from routes.comment import commentsrouter
+from db import models
+from routes.comments import commentsrouter
 
 
 postsrouter = APIRouter()
 
 
-async def get_post_or_404(session: AsyncSession, post_id: int):
-    post = await PostRepository.get_post(session, post_id)
-    if not post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return post
-
-
-def user_is_author_or_forbidden(post, user_auth):
+def user_is_author_or_forbidden(post: models.Post, user_auth: UserAuth):
     if post.author_id != user_auth.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return True
+
+
+async def get_post_or_404(session: AsyncSession, post_id: int):
+    post = await PostRepository.get_post(session, post_id)
+    if not post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Post not found"
+        )
+    return post
 
 
 async def get_group_or_400(session: AsyncSession, group_id: int):
@@ -67,7 +70,9 @@ async def get_posts(
     session: AsyncSession = Depends(get_session),
 ):
     posts = await PostRepository.get_posts(session)
-    return paginate(posts)
+    if posts:
+        return paginate(posts)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Posts not found")
 
 
 @postsrouter.get("/{post_id}/", response_model=PostComments)
@@ -75,8 +80,8 @@ async def get_post(
     post_id: int,
     session: AsyncSession = Depends(get_session),
 ):
-    posts = await PostRepository.get_post(session, post_id)
-    return posts
+    post = await get_post_or_404(session, post_id)
+    return post
 
 
 @postsrouter.put("/{post_id}/", response_model=PostDB)

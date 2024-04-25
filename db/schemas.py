@@ -34,6 +34,10 @@ class UserFollowers(UserDB):
     following: Optional[list["UserDB"]] = None
 
 
+class UserFollowing(UserDB):
+    following: Optional[list["UserDB"]] = None
+
+
 class UserAuth(BaseModel):
     id: int
     username: str
@@ -55,7 +59,7 @@ class GroupDB(Group, GroupCreate):
 
 
 class GroupPosts(GroupDB):
-    posts_group: Optional[list["Post"]] = None
+    posts_group: Optional[list["PostDB"]] = None
 
 
 class Post(BaseModel):
