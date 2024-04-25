@@ -38,12 +38,12 @@ async def get_comment_or_404(session: AsyncSession, comment_id: int):
 
 @commentsrouter.post("/", response_model=CommentDB)
 async def create_comment(
-    comment_data: CommentCreate,
+    comment_data: CommentCreate = Depends(),
     post_id: int = Path(..., title="The id of the post"),
     session: AsyncSession = Depends(get_session),
     user_auth: UserAuth = Depends(get_user_from_token),
 ):
-    post = get_post_or_404(session, post_id)
+    post = await get_post_or_404(session, post_id)
     comment = await CommentRepository.create_comment(
         session, comment_data, post.id, user_auth.id
     )
@@ -81,7 +81,7 @@ async def update_comment(
     user_auth: UserAuth = Depends(get_user_from_token),
 ):
     await get_post_or_404(session, post_id)
-    comment = get_comment_or_404(session, comment_id)
+    comment = await get_comment_or_404(session, comment_id)
     user_is_author_or_forbidden(comment, user_auth)
     update_comment = await CommentRepository.update_commnet(
         session, comment, new_comment_data
@@ -97,8 +97,8 @@ async def delete_comment(
     user_auth: UserAuth = Depends(get_user_from_token),
 ):
     await get_post_or_404(session, post_id)
-    comment = get_comment_or_404(session, comment_id)
-    user_is_author_or_forbidden(session, user_auth)
+    comment = await get_comment_or_404(session, comment_id)
+    user_is_author_or_forbidden(comment, user_auth)
     result = await CommentRepository.delete_comment(session, comment)
     if result:
         return Response(status_code=status.HTTP_204_NO_CONTENT)

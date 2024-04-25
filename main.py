@@ -9,6 +9,7 @@ from routes.posts import postsrouter
 from routes.groups import groupsrouter
 from routes.follow import followrouter
 
+
 app = FastAPI()
 
 

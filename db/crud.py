@@ -19,6 +19,12 @@ class UserRepository:
 
     @classmethod
     async def get_user(cls, session: AsyncSession, username: str):
+        query = select(models.User).filter_by(username=username)
+        result = await session.execute(query)
+        return result.scalars().first()
+
+    @classmethod
+    async def get_user_with_following(cls, session: AsyncSession, username: str):
         query = (
             select(models.User)
             .filter_by(username=username)
@@ -44,6 +50,16 @@ class UserRepository:
         return result.scalars().first()
 
     @classmethod
+    async def get_user_followers(cls, session: AsyncSession, username: str):
+        query = (
+            select(models.User)
+            .filter_by(username=username)
+            .options(joinedload(models.User.following))
+        )
+        result = await session.execute(query)
+        return result.scalars().first()
+
+    @classmethod
     async def follow_user(
         cls, session: AsyncSession, user_to_follow: models.User, follower: models.User
     ):
@@ -51,19 +67,6 @@ class UserRepository:
         await session.commit()
         await session.refresh(user_to_follow)
         return user_to_follow
-
-
-#     @classmethod
-#     async def create_referral_user(
-#         cls,
-#         session: AsyncSession,
-#         referral_user: models.User,
-#         referrer_user: models.User,
-#     ):
-#         referrer_user.referral.append(referral_user)
-#         await session.commit()
-#         await session.refresh(referrer_user)
-#         return referral_user
 
 
 class GroupRepository:
