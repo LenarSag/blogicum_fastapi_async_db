@@ -1,4 +1,4 @@
-# api_final_yatube_fastapi
+# blogicum на FASTAPI
 
 Подключаем и настраиваем алембик:
 
