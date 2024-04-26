@@ -44,6 +44,10 @@ target_metadata = Base.metadata
 alembic revision --autogenerate -m 'initial'
 alembic upgrade head
 
+Запуск проекта:
+
+python main.py
+
 
 ## Документация для API запросов:
 
