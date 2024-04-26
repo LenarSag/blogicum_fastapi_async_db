@@ -68,6 +68,14 @@ class UserRepository:
         await session.refresh(user_to_follow)
         return user_to_follow
 
+    @classmethod
+    async def unfollow_user(
+        cls, session: AsyncSession, user_to_unfollow: models.User, follower: models.User
+    ):
+        user_to_unfollow.following.remove(follower)
+        await session.commit()
+        return True
+
 
 class GroupRepository:
     @classmethod
